@@ -21,24 +21,15 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            transition: background 0.1s steps(2);
         }
 
         body.file-detected { background: var(--bg-detect) no-repeat center center fixed; background-size: cover; }
 
-        /* Bulle avec dégradé PIXELISÉ */
         .art-bubble {
             position: relative; width: 280px; height: 280px; border-radius: 50%;
             cursor: pointer; display: flex; justify-content: center; align-items: center;
-            border: 8px solid #fff; box-shadow: 0 0 0 6px rgba(0,0,0,0.2);
-            transition: transform 0.2s steps(4);
+            border: 8px solid #fff; transition: transform 0.2s steps(4);
             background: radial-gradient(circle, #fff 0%, #fff 30%, #ffb3c1 30%, #ffb3c1 60%, #ff85a2 60%, #ff85a2 85%, #ff4d6d 85%, #ff4d6d 100%);
-        }
-
-        .art-bubble::after {
-            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            border-radius: 50%; background-image: radial-gradient(rgba(0,0,0,0.1) 1px, transparent 1px);
-            background-size: 4px 4px; pointer-events: none;
         }
 
         .art-bubble.dragover {
@@ -46,38 +37,35 @@
             background: radial-gradient(circle, #ccffdd 0%, #ccffdd 30%, #81e6a5 30%, #81e6a5 60%, #43b581 60%, #43b581 85%, #2d7d5a 85%, #2d7d5a 100%);
         }
 
-        .art-bubble h1 { color: white; font-size: 16px; text-align: center; text-shadow: 3px 3px 0px #000; z-index: 3; pointer-events: none; }
+        .art-bubble h1 { color: white; font-size: 16px; text-align: center; text-shadow: 3px 3px 0px #000; pointer-events: none; }
 
+        /* Style du bouton Galerie */
         nav { position: fixed; top: 20px; right: 20px; z-index: 10; }
-        .btn-view { background: #ff85a2; color: white; padding: 15px; border: 4px solid #fff; font-family: 'Press Start 2P'; font-size: 10px; cursor: pointer; }
-        .btn-view:hover { background: #43b581; }
+        .btn-view { 
+            background: #43b581; color: white; padding: 15px; border: 4px solid #fff; 
+            font-family: 'Press Start 2P'; font-size: 10px; cursor: pointer;
+            text-decoration: none; display: inline-block;
+        }
+        .btn-view:hover { background: #ff85a2; transform: scale(1.05); }
 
-        #galerie-page { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 100; padding: 40px; overflow-y: auto; text-align: center;}
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; margin-top: 30px; }
-        .grid img { width: 100%; border: 4px solid #43b581; image-rendering: pixelated; background: #222; }
     </style>
 </head>
 <body id="main-body">
 
-    <nav><button class="btn-view" onclick="toggleGalerie()">Voir tous les projets</button></nav>
+    <nav>
+        <a href="https://discordapp.com/channels/1482338085382520925/1482796108756418642" target="_blank" class="btn-view">VOIR LA GALERIE DISCORD</a>
+    </nav>
 
     <div class="art-bubble" id="drop-zone" onclick="document.getElementById('file-input').click()">
         <h1>ART<br>CLOUD</h1>
         <input type="file" id="file-input" hidden accept="image/*">
     </div>
 
-    <div id="galerie-page">
-        <h1 style="color: #43b581;">PROJETS PNG</h1>
-        <button class="btn-view" onclick="toggleGalerie()" style="background:#43b581">RETOUR</button>
-        <div class="grid" id="art-grid"></div>
-    </div>
-
     <script>
         const dropZone = document.getElementById('drop-zone');
         const body = document.getElementById('main-body');
-        const artGrid = document.getElementById('art-grid');
 
-        // --- CEST ICI QUE TU METS TON LIEN DISCORD ---
+        // --- CONFIGURATION ---
         const DISCORD_WEBHOOK_URL = "https://discordapp.com/api/webhooks/1482855411165167802/35fbNBbJ5N1Pj3HbE-FO5O4cROq9rAU23mgl_X_ketCOVg-jK_LHF1l96VPj8fha_gvW"; 
 
         window.addEventListener('dragover', (e) => { e.preventDefault(); body.classList.add('file-detected'); });
@@ -98,16 +86,6 @@
         function handleFiles(files) {
             for (let file of files) {
                 if (file.type.startsWith('image/')) {
-                    // Affichage dans la galerie du site
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const img = document.createElement('img');
-                        img.src = e.target.result;
-                        artGrid.appendChild(img);
-                    };
-                    reader.readAsDataURL(file);
-
-                    // Envoi automatique vers ton salon Discord
                     const formData = new FormData();
                     formData.append('file', file);
                     
@@ -115,17 +93,12 @@
                         method: 'POST',
                         body: formData
                     }).then(() => {
-                        alert("Image envoyée avec succès sur Discord !");
+                        alert("Génial ! Ton dessin est maintenant dans la galerie Discord !");
                     }).catch(err => {
-                        console.error("Erreur d'envoi :", err);
+                        alert("Erreur lors de l'envoi.");
                     });
                 }
             }
-        }
-
-        function toggleGalerie() {
-            const gal = document.getElementById('galerie-page');
-            gal.style.display = (gal.style.display === 'block') ? 'none' : 'block';
         }
     </script>
 </body>
